@@ -1,7 +1,9 @@
 'use client';
 import { signIn, signOut, useSession } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
-export default function Page() {
+export default function HomePage() {
   const { data: session } = useSession();
   if (typeof session?.user !== 'undefined') {
     return (
@@ -14,7 +16,11 @@ export default function Page() {
   return (
     <>
       Not signed in <br />
-      <button onClick={() => signIn()}>Sign in</button>
+      <Button onClick={() => signIn()}>Sign in</Button>
+      or
+      <Button asChild>
+        <Link href="/auth/sign-up">Sign up</Link>
+      </Button>
     </>
   );
 

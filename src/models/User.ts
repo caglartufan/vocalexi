@@ -11,6 +11,16 @@ export interface IUser {
   updatedAt?: Date;
 }
 
+export interface PublicUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  isAdmin?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 // 2. Extend Document if you want `._id` and mongoose instance methods
 export interface IUserDocument extends IUser, Document {}
 
@@ -23,7 +33,18 @@ const UserSchema = new Schema<IUserDocument>(
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      transform: (doc, ret: any) => {
+        ret.id = ret._id.toString();
+        delete ret._id;
+        delete ret.password;
+        delete ret.__v;
+      },
+    },
+  },
 );
 
 // 4. Safe model export (avoids overwrite error in Next.js dev)

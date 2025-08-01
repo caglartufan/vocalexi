@@ -1,14 +1,12 @@
 import type { Metadata } from 'next';
-import { Nunito_Sans } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import './globals.css';
-import MobileBottomNav from '@/app/components/layout/MobileBottomNav';
 import React from 'react';
-import HeaderToolbar from '@/app/components/layout/HeaderToolbar';
 import SessionProvider from './session-provider';
 import { getServerSession } from 'next-auth';
 
-const nunitoSans = Nunito_Sans({
-  variable: '--font-nunito-sans',
+const interSans = Inter({
+  variable: '--font-inter-sans',
   subsets: ['latin'],
 });
 
@@ -26,14 +24,8 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${nunitoSans.variable} antialiased dark`}>
-        <SessionProvider session={session}>
-          <main className="flex flex-col gap-y-4 font-sans h-screen p-4 pb-16">
-            <HeaderToolbar />
-            {children}
-          </main>
-          <MobileBottomNav />
-        </SessionProvider>
+      <body className={`${interSans.variable} antialiased`}>
+        <SessionProvider session={session}>{children}</SessionProvider>
       </body>
     </html>
   );

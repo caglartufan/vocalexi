@@ -1,13 +1,12 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import GithubProvider from 'next-auth/providers/github';
-import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import { connectDB } from '@/lib/connectDB';
 import { User } from '@/models/User';
-import client from '@/lib/db';
+import bcrypt from 'bcrypt';
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(client),
+  debug: true,
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -20,15 +19,35 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (typeof credentials?.email === 'undefined') return null;
+        if (
+          typeof credentials?.email !== 'string' ||
+          typeof credentials?.password !== 'string'
+        )
+          return null;
 
         await connectDB();
 
-        return User.findOne({
+        const user = await User.findOne({
           email: credentials.email,
         });
+
+        if (!user) return null;
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.password,
+        );
+
+        if (!isPasswordValid) return null;
+
+        return {
+          id: user._id!.toString(),
+          firstName: user.firstName,
+          lastName: user.firstName,
+          email: user.email,
+          isAdmin: user.isAdmin,
+        };
       },
     }),
-    GithubProvider({ clientId: '', clientSecret: '' }),
   ],
 };

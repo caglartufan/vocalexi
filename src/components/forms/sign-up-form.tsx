@@ -1,0 +1,159 @@
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import React from 'react';
+import Link from 'next/link';
+import { useFormik } from 'formik';
+import { signUpRequestSchema } from '@/validation-schemas/sign-up';
+import { IUser } from '@/models/User';
+import { signIn } from 'next-auth/react';
+import Image from 'next/image';
+import AuthLink from '@/components/typography/auth-link';
+
+export default function SignUpForm({
+  className,
+  ...props
+}: React.ComponentProps<'div'>) {
+  const formik = useFormik({
+    initialValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      passwordConfirmation: '',
+    },
+    validationSchema: signUpRequestSchema,
+    onSubmit: async (values) => {
+      const res = await fetch('/api/auth/sign-up', {
+        method: 'POST',
+        body: JSON.stringify(values),
+      });
+
+      const data: {
+        success: boolean;
+        message?: string;
+        errors?: string[];
+        user?: Partial<IUser>;
+      } = await res.json();
+
+      if (res.status === 201 && data.success) {
+        await signIn('credentials', {
+          callbackUrl: 'http://localhost:3000/',
+          redirect: true,
+          email: values.email,
+          password: values.password,
+        });
+      }
+    },
+  });
+
+  return (
+    <div className={cn('flex flex-col gap-6', className)} {...props}>
+      <form>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-6">
+            <Link
+              href="/"
+              className="flex flex-col items-center gap-2 font-medium"
+            >
+              <div className="flex items-center justify-center gap-x-[11px] rounded-md">
+                <Image
+                  src="/images/logo.png"
+                  alt="Vocalexi Logo"
+                  width={56.64}
+                  height={47.2}
+                  className="w-14"
+                />
+                <h1 className="text-3xl font-bold">Vocalexi</h1>
+                <span className="sr-only">Vocalexi</span>
+              </div>
+            </Link>
+            <h2 className="text-2xl font-bold">Welcome New User!</h2>
+          </div>
+          <div className="flex flex-col items-center gap-y-3">
+            <Input
+              id="firstName"
+              type="text"
+              placeholder="First name"
+              className="h-10 rounded-full"
+              required
+            />
+            <Input
+              id="lastName"
+              type="text"
+              placeholder="Last name"
+              className="h-10 rounded-full"
+              required
+            />
+            <Input
+              id="email"
+              type="email"
+              placeholder="Email"
+              className="h-10 rounded-full"
+              required
+            />
+            <Input
+              id="password"
+              type="password"
+              placeholder="Password"
+              className="h-10 rounded-full"
+              required
+            />
+            <Input
+              id="passwordConfirmation"
+              type="passwordConfirmation"
+              placeholder="Password confirmation"
+              className="h-10 rounded-full"
+              required
+            />
+            <Button type="submit" className="w-full rounded-full h-10">
+              Sign Up
+            </Button>
+            <div className="text-center text-xs">
+              Already have an account?{' '}
+              <AuthLink href="/sign-in">Sign In</AuthLink>
+            </div>
+            <div className="w-full after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+              <span className="bg-background text-muted-foreground relative z-10 px-2">
+                Or
+              </span>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Button
+                variant="outline"
+                type="button"
+                className="h-12 w-[220px] sm:w-full rounded-full"
+              >
+                <Image
+                  src="/images/brand-logo/facebook.svg"
+                  alt="Google Logo"
+                  width={20}
+                  height={20}
+                />
+                Sign up with Facebook
+              </Button>
+              <Button
+                variant="outline"
+                type="button"
+                className="h-12 w-[220px] sm:w-full rounded-full"
+              >
+                <Image
+                  src="/images/brand-logo/google.svg"
+                  alt="Google Logo"
+                  width={16}
+                  height={16}
+                />
+                Sign up with Google
+              </Button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div className="text-muted-foreground text-center text-xs text-balance">
+        By clicking continue, you agree to our{' '}
+        <AuthLink href="#">Terms of Service</AuthLink> and{' '}
+        <AuthLink href="#">Privacy Policy</AuthLink>.
+      </div>
+    </div>
+  );
+}
