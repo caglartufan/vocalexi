@@ -4,6 +4,7 @@ import './globals.css';
 import React from 'react';
 import SessionProvider from './session-provider';
 import { getServerSession } from 'next-auth';
+import { Toaster } from 'sonner';
 
 const interSans = Inter({
   variable: '--font-inter-sans',
@@ -26,6 +27,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${interSans.variable} antialiased`}>
         <SessionProvider session={session}>{children}</SessionProvider>
+        <Toaster />
       </body>
     </html>
   );

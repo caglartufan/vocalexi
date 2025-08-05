@@ -1,20 +1,43 @@
+'use client';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import React from 'react';
-import Link from 'next/link';
 import { useFormik } from 'formik';
 import { signUpRequestSchema } from '@/validation-schemas/sign-up';
 import { IUser } from '@/models/User';
 import { signIn } from 'next-auth/react';
-import Image from 'next/image';
 import AuthLink from '@/components/typography/auth-link';
+import { FormErrorMessage } from '@/components/ui/form-error-message';
+import { toast } from 'sonner';
+import {
+  getInputVariant,
+  hasFormikFieldError,
+  SuccessIcon,
+} from '@/components/forms/shared/form-input-utils';
+import { SocialLoginButtons } from '@/components/forms/shared/social-login-buttons';
+import { FormFooter } from '@/components/forms/shared/form-footer';
+import { FormHeader } from '@/components/forms/shared/form-header';
+import { FormErrorAlert } from '@/components/forms/shared/form-error-alert';
+import { useAuthError } from '@/components/forms/shared/use-auth-error';
+import { useRouter } from 'next/navigation';
+
+type SignUpFormFields = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+};
 
 export default function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  const formik = useFormik({
+  const router = useRouter();
+  const { error, clearError, setAuthError, setComplexError } = useAuthError();
+
+  const formik = useFormik<SignUpFormFields>({
     initialValues: {
       firstName: '',
       lastName: '',
@@ -24,88 +47,191 @@ export default function SignUpForm({
     },
     validationSchema: signUpRequestSchema,
     onSubmit: async (values) => {
-      const res = await fetch('/api/auth/sign-up', {
-        method: 'POST',
-        body: JSON.stringify(values),
-      });
+      try {
+        clearError();
 
-      const data: {
-        success: boolean;
-        message?: string;
-        errors?: string[];
-        user?: Partial<IUser>;
-      } = await res.json();
-
-      if (res.status === 201 && data.success) {
-        await signIn('credentials', {
-          callbackUrl: 'http://localhost:3000/',
-          redirect: true,
-          email: values.email,
-          password: values.password,
+        const signUpRes = await fetch('/api/auth/sign-up', {
+          method: 'POST',
+          body: JSON.stringify(values),
         });
+
+        const data: {
+          success: boolean;
+          message?: string;
+          errors?: string[];
+          user?: Partial<IUser>;
+        } = await signUpRes.json();
+
+        if (signUpRes.status === 201 && data.success) {
+          const signInRes = await signIn('credentials', {
+            callbackUrl: '/',
+            redirect: false,
+            email: values.email,
+            password: values.password,
+          });
+
+          if (typeof signInRes === 'undefined') {
+            setAuthError(
+              'Something went wrong during sign up. Please try again.',
+            );
+            return;
+          }
+
+          if (signInRes.ok) {
+            toast('You have successfully signed up!');
+            if (typeof signInRes.url === 'string') {
+              router.push(signInRes.url);
+              return;
+            }
+          } else if (signInRes.error === 'CredentialsSignin') {
+            setAuthError(
+              'Invalid email or password. Please check your credentials and try again.',
+            );
+          } else {
+            setAuthError(
+              'Something went wrong during sign up. Please try again.',
+            );
+          }
+        } else {
+          // Handle sign-up errors
+          if (data.message && data.errors && data.errors.length > 0) {
+            setComplexError(data.message, data.errors);
+          } else if (data.message) {
+            setAuthError(data.message);
+          } else {
+            setAuthError(
+              'Something went wrong during sign up. Please try again.',
+            );
+          }
+        }
+      } catch (error) {
+        let message = 'An error occurred during sign up. Please try again.';
+        if (error instanceof Error) {
+          message = `An error occurred during sign up. ${error.message}`;
+        }
+        setAuthError(message);
       }
     },
   });
 
+  // Extract error checks using shared utilities
+  const firstNameHasError = hasFormikFieldError(formik, 'firstName');
+  const lastNameHasError = hasFormikFieldError(formik, 'lastName');
+  const emailHasError = hasFormikFieldError(formik, 'email');
+  const passwordHasError = hasFormikFieldError(formik, 'password');
+  const passwordConfirmationHasError = hasFormikFieldError(
+    formik,
+    'passwordConfirmation',
+  );
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
-      <form>
+      <form onSubmit={formik.handleSubmit}>
         <div className="flex flex-col gap-6">
-          <div className="flex flex-col items-center gap-6">
-            <Link
-              href="/"
-              className="flex flex-col items-center gap-2 font-medium"
-            >
-              <div className="flex items-center justify-center gap-x-[11px] rounded-md">
-                <Image
-                  src="/images/logo.png"
-                  alt="Vocalexi Logo"
-                  width={56.64}
-                  height={47.2}
-                  className="w-14"
+          <FormHeader title="Welcome New User!" />
+          <FormErrorAlert error={error} />
+          <div className="flex flex-col items-stretch gap-y-3">
+            <div>
+              <Input
+                id="firstName"
+                type="text"
+                placeholder="First name"
+                className="h-10 rounded-full"
+                variant={getInputVariant(formik, 'firstName')}
+                rightElement={
+                  getInputVariant(formik, 'firstName') === 'success' && (
+                    <SuccessIcon />
+                  )
+                }
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                required
+              />
+              {firstNameHasError && (
+                <FormErrorMessage message={formik.errors.firstName!} />
+              )}
+            </div>
+            <div>
+              <Input
+                id="lastName"
+                type="text"
+                placeholder="Last name"
+                className="h-10 rounded-full"
+                variant={getInputVariant(formik, 'lastName')}
+                rightElement={
+                  getInputVariant(formik, 'lastName') === 'success' && (
+                    <SuccessIcon />
+                  )
+                }
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                required
+              />
+              {lastNameHasError && (
+                <FormErrorMessage message={formik.errors.lastName!} />
+              )}
+            </div>
+            <div>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Email address"
+                className="h-10 rounded-full"
+                variant={getInputVariant(formik, 'email')}
+                rightElement={
+                  getInputVariant(formik, 'email') === 'success' && (
+                    <SuccessIcon />
+                  )
+                }
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                required
+              />
+              {emailHasError && (
+                <FormErrorMessage message={formik.errors.email!} />
+              )}
+            </div>
+            <div>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Password"
+                className="h-10 rounded-full"
+                variant={getInputVariant(formik, 'password')}
+                rightElement={
+                  getInputVariant(formik, 'password') === 'success' && (
+                    <SuccessIcon />
+                  )
+                }
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                required
+              />
+              {passwordHasError && (
+                <FormErrorMessage message={formik.errors.password!} />
+              )}
+            </div>
+            <div>
+              <Input
+                id="passwordConfirmation"
+                type="password"
+                placeholder="Password confirmation"
+                className="h-10 rounded-full"
+                variant={getInputVariant(formik, 'passwordConfirmation')}
+                rightElement={
+                  getInputVariant(formik, 'passwordConfirmation') ===
+                    'success' && <SuccessIcon />
+                }
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                required
+              />
+              {passwordConfirmationHasError && (
+                <FormErrorMessage
+                  message={formik.errors.passwordConfirmation!}
                 />
-                <h1 className="text-3xl font-bold">Vocalexi</h1>
-                <span className="sr-only">Vocalexi</span>
-              </div>
-            </Link>
-            <h2 className="text-2xl font-bold">Welcome New User!</h2>
-          </div>
-          <div className="flex flex-col items-center gap-y-3">
-            <Input
-              id="firstName"
-              type="text"
-              placeholder="First name"
-              className="h-10 rounded-full"
-              required
-            />
-            <Input
-              id="lastName"
-              type="text"
-              placeholder="Last name"
-              className="h-10 rounded-full"
-              required
-            />
-            <Input
-              id="email"
-              type="email"
-              placeholder="Email"
-              className="h-10 rounded-full"
-              required
-            />
-            <Input
-              id="password"
-              type="password"
-              placeholder="Password"
-              className="h-10 rounded-full"
-              required
-            />
-            <Input
-              id="passwordConfirmation"
-              type="passwordConfirmation"
-              placeholder="Password confirmation"
-              className="h-10 rounded-full"
-              required
-            />
+              )}
+            </div>
             <Button type="submit" className="w-full rounded-full h-10">
               Sign Up
             </Button>
@@ -113,47 +239,11 @@ export default function SignUpForm({
               Already have an account?{' '}
               <AuthLink href="/sign-in">Sign In</AuthLink>
             </div>
-            <div className="w-full after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-              <span className="bg-background text-muted-foreground relative z-10 px-2">
-                Or
-              </span>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Button
-                variant="outline"
-                type="button"
-                className="h-12 w-[220px] sm:w-full rounded-full"
-              >
-                <Image
-                  src="/images/brand-logo/facebook.svg"
-                  alt="Google Logo"
-                  width={20}
-                  height={20}
-                />
-                Sign up with Facebook
-              </Button>
-              <Button
-                variant="outline"
-                type="button"
-                className="h-12 w-[220px] sm:w-full rounded-full"
-              >
-                <Image
-                  src="/images/brand-logo/google.svg"
-                  alt="Google Logo"
-                  width={16}
-                  height={16}
-                />
-                Sign up with Google
-              </Button>
-            </div>
+            <SocialLoginButtons actionText="Sign up" />
           </div>
         </div>
       </form>
-      <div className="text-muted-foreground text-center text-xs text-balance">
-        By clicking continue, you agree to our{' '}
-        <AuthLink href="#">Terms of Service</AuthLink> and{' '}
-        <AuthLink href="#">Privacy Policy</AuthLink>.
-      </div>
+      <FormFooter />
     </div>
   );
 }
