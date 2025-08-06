@@ -6,7 +6,7 @@ import React from 'react';
 import AuthLink from '@/components/typography/auth-link';
 import { useFormik } from 'formik';
 import { signIn } from 'next-auth/react';
-import { signInRequestSchema } from '@/validation-schemas/sign-in';
+import { getSignInRequestSchema } from '@/validation-schemas/sign-in';
 import { FormErrorMessage } from '@/components/ui/form-error-message';
 import { FormHeader } from './shared/form-header';
 import { FormErrorAlert } from './shared/form-error-alert';
@@ -20,6 +20,7 @@ import {
 import { useAuthError } from './shared/use-auth-error';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 type SignInFormFields = {
   email: string;
@@ -30,6 +31,7 @@ export default function SignInForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const t = useTranslations();
   const router = useRouter();
   const { error, clearError, setAuthError } = useAuthError();
 
@@ -38,7 +40,7 @@ export default function SignInForm({
       email: '',
       password: '',
     },
-    validationSchema: signInRequestSchema,
+    validationSchema: getSignInRequestSchema(t),
     onSubmit: async (values) => {
       try {
         clearError();
@@ -51,31 +53,25 @@ export default function SignInForm({
         });
 
         if (typeof signInRes === 'undefined') {
-          setAuthError(
-            'Something went wrong during sign in. Please try again.',
-          );
+          setAuthError(t('Auth.error.generic_signin'));
           return;
         }
 
         if (signInRes.ok) {
-          toast('You have successfully signed in!');
+          toast(t('Auth.success.signed_in'));
           if (typeof signInRes.url === 'string') {
             router.push(signInRes.url);
             return;
           }
         } else if (signInRes.error === 'CredentialsSignin') {
-          setAuthError(
-            'Invalid email or password. Please check your credentials and try again.',
-          );
+          setAuthError(t('Auth.error.invalid_credentials'));
         } else {
-          setAuthError(
-            'Something went wrong during sign in. Please try again.',
-          );
+          setAuthError(t('Auth.error.generic_signin'));
         }
       } catch (error) {
-        let message = 'An error occurred during sign in. Please try again.';
+        let message = t('Auth.error.unknown_signin');
         if (error instanceof Error) {
-          message = `An error occurred during sign in. ${error.message}`;
+          message = `${t('Auth.error.unknown_signin')}: ${error.message}`;
         }
         setAuthError(message);
       }
@@ -90,14 +86,14 @@ export default function SignInForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <form onSubmit={formik.handleSubmit}>
         <div className="flex flex-col gap-6">
-          <FormHeader title="Welcome Back!" />
+          <FormHeader title={t('Auth.signin.title')} />
           <FormErrorAlert error={error} />
           <div className="flex flex-col items-stretch gap-y-3">
             <div>
               <Input
                 id="email"
                 type="email"
-                placeholder="Email address"
+                placeholder={t('Auth.fields.email')}
                 className="h-10 rounded-full"
                 variant={getInputVariant(formik, 'email')}
                 rightElement={
@@ -117,7 +113,7 @@ export default function SignInForm({
               <Input
                 id="password"
                 type="password"
-                placeholder="Password"
+                placeholder={t('Auth.fields.password')}
                 className="h-10 rounded-full"
                 variant={getInputVariant(formik, 'password')}
                 rightElement={
@@ -134,15 +130,20 @@ export default function SignInForm({
               )}
             </div>
             <Button type="submit" className="w-full rounded-full h-10">
-              Sign In
+              {t('Auth.signin.button')}
             </Button>
             <div className="text-center">
-              <AuthLink href="/forgot-password">Forgot Password?</AuthLink>
+              <AuthLink href="/forgot-password">
+                {t('Auth.signin.forgot')}
+              </AuthLink>
             </div>
             <div className="text-center text-xs">
-              New user? <AuthLink href="/sign-up">Sign Up</AuthLink>
+              {t('Auth.signin.new_user')}{' '}
+              <AuthLink href="/sign-up">
+                {t('Auth.signin.signup_link')}
+              </AuthLink>
             </div>
-            <SocialLoginButtons actionText="Sign in" />
+            <SocialLoginButtons actionText={t('Auth.signin.button')} />
           </div>
         </div>
       </form>

@@ -1,0 +1,50 @@
+{
+  "Auth": {
+    "fields": {
+      "email": "Email address",
+      "password": "Password",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "password_confirmation": "Password confirmation"
+    },
+    "validation": {
+      "email_required": "Please enter an email address.",
+      "password_required": "Please enter a password.",
+      "first_name_required": "Please enter your first name.",
+      "last_name_required": "Please enter your last name.",
+      "password_confirmation_required": "Please confirm your password.",
+      "email": "Please enter a valid email address.",
+      "email_max": "Email must be at most 255 characters.",
+      "password_min": "Password must be at least 6 characters.",
+      "first_name_min": "First name must be at least 2 characters.",
+      "first_name_max": "First name must be at most 50 characters.",
+      "last_name_min": "Last name must be at least 2 characters.",
+      "last_name_max": "Last name must be at most 50 characters.",
+      "password_match": "Passwords must match."
+    },
+    "signin": {
+      "title": "Welcome Back!",
+      "button": "Sign In",
+      "forgot": "Forgot Password?",
+      "new_user": "New user?",
+      "signup_link": "Sign Up"
+    },
+    "signup": {
+      "title": "Welcome New User!",
+      "button": "Sign Up",
+      "already_have_account": "Already have an account?",
+      "signin_link": "Sign In"
+    },
+    "error": {
+      "invalid_credentials": "Invalid email or password. Please check your credentials and try again.",
+      "generic_signin": "Something went wrong during sign in. Please try again.",
+      "generic_signup": "Something went wrong during sign up. Please try again.",
+      "unknown_signin": "An error occurred during sign in. Please try again.",
+      "unknown_signup": "An error occurred during sign up. Please try again."
+    },
+    "success": {
+      "signed_in": "You have successfully signed in!",
+      "signed_up": "You have successfully signed up!"
+    }
+  }
+}

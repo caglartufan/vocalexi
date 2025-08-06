@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import React from 'react';
 import { useFormik } from 'formik';
-import { signUpRequestSchema } from '@/validation-schemas/sign-up';
+import { getSignUpRequestSchema } from '@/validation-schemas/sign-up';
 import { IUser } from '@/models/User';
 import { signIn } from 'next-auth/react';
 import AuthLink from '@/components/typography/auth-link';
@@ -21,6 +21,7 @@ import { FormHeader } from '@/components/forms/shared/form-header';
 import { FormErrorAlert } from '@/components/forms/shared/form-error-alert';
 import { useAuthError } from '@/components/forms/shared/use-auth-error';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 type SignUpFormFields = {
   firstName: string;
@@ -34,6 +35,7 @@ export default function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const t = useTranslations();
   const router = useRouter();
   const { error, clearError, setAuthError, setComplexError } = useAuthError();
 
@@ -45,7 +47,7 @@ export default function SignUpForm({
       password: '',
       passwordConfirmation: '',
     },
-    validationSchema: signUpRequestSchema,
+    validationSchema: getSignUpRequestSchema(t),
     onSubmit: async (values) => {
       try {
         clearError();
@@ -71,26 +73,20 @@ export default function SignUpForm({
           });
 
           if (typeof signInRes === 'undefined') {
-            setAuthError(
-              'Something went wrong during sign up. Please try again.',
-            );
+            setAuthError(t('Auth.error.generic_signup'));
             return;
           }
 
           if (signInRes.ok) {
-            toast('You have successfully signed up!');
+            toast(t('Auth.success.signed_up'));
             if (typeof signInRes.url === 'string') {
               router.push(signInRes.url);
               return;
             }
           } else if (signInRes.error === 'CredentialsSignin') {
-            setAuthError(
-              'Invalid email or password. Please check your credentials and try again.',
-            );
+            setAuthError(t('Auth.error.invalid_credentials'));
           } else {
-            setAuthError(
-              'Something went wrong during sign up. Please try again.',
-            );
+            setAuthError(t('Auth.error.generic_signup'));
           }
         } else {
           // Handle sign-up errors
@@ -99,15 +95,13 @@ export default function SignUpForm({
           } else if (data.message) {
             setAuthError(data.message);
           } else {
-            setAuthError(
-              'Something went wrong during sign up. Please try again.',
-            );
+            setAuthError(t('Auth.error.generic_signup'));
           }
         }
       } catch (error) {
-        let message = 'An error occurred during sign up. Please try again.';
+        let message = t('Auth.error.unknown_signup');
         if (error instanceof Error) {
-          message = `An error occurred during sign up. ${error.message}`;
+          message = `${t('Auth.error.unknown_signup')}: ${error.message}`;
         }
         setAuthError(message);
       }
@@ -128,14 +122,14 @@ export default function SignUpForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <form onSubmit={formik.handleSubmit}>
         <div className="flex flex-col gap-6">
-          <FormHeader title="Welcome New User!" />
+          <FormHeader title={t('Auth.signup.title')} />
           <FormErrorAlert error={error} />
           <div className="flex flex-col items-stretch gap-y-3">
             <div>
               <Input
                 id="firstName"
                 type="text"
-                placeholder="First name"
+                placeholder={t('Auth.fields.first_name')}
                 className="h-10 rounded-full"
                 variant={getInputVariant(formik, 'firstName')}
                 rightElement={
@@ -155,7 +149,7 @@ export default function SignUpForm({
               <Input
                 id="lastName"
                 type="text"
-                placeholder="Last name"
+                placeholder={t('Auth.fields.last_name')}
                 className="h-10 rounded-full"
                 variant={getInputVariant(formik, 'lastName')}
                 rightElement={
@@ -175,7 +169,7 @@ export default function SignUpForm({
               <Input
                 id="email"
                 type="email"
-                placeholder="Email address"
+                placeholder={t('Auth.fields.email')}
                 className="h-10 rounded-full"
                 variant={getInputVariant(formik, 'email')}
                 rightElement={
@@ -195,7 +189,7 @@ export default function SignUpForm({
               <Input
                 id="password"
                 type="password"
-                placeholder="Password"
+                placeholder={t('Auth.fields.password')}
                 className="h-10 rounded-full"
                 variant={getInputVariant(formik, 'password')}
                 rightElement={
@@ -215,7 +209,7 @@ export default function SignUpForm({
               <Input
                 id="passwordConfirmation"
                 type="password"
-                placeholder="Password confirmation"
+                placeholder={t('Auth.fields.password_confirmation')}
                 className="h-10 rounded-full"
                 variant={getInputVariant(formik, 'passwordConfirmation')}
                 rightElement={
@@ -233,13 +227,15 @@ export default function SignUpForm({
               )}
             </div>
             <Button type="submit" className="w-full rounded-full h-10">
-              Sign Up
+              {t('Auth.signup.button')}
             </Button>
             <div className="text-center text-xs">
-              Already have an account?{' '}
-              <AuthLink href="/sign-in">Sign In</AuthLink>
+              {t('Auth.signup.already_have_account')}{' '}
+              <AuthLink href="/sign-in">
+                {t('Auth.signup.signin_link')}
+              </AuthLink>
             </div>
-            <SocialLoginButtons actionText="Sign up" />
+            <SocialLoginButtons actionText={t('Auth.signup.button')} />
           </div>
         </div>
       </form>

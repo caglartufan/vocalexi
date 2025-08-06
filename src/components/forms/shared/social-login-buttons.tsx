@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
 interface SocialLoginButtonsProps {
-  actionText: 'Sign up' | 'Sign in';
+  actionText: string;
 }
 
 export function SocialLoginButtons({ actionText }: SocialLoginButtonsProps) {
