@@ -1,17 +1,21 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 interface SocialLoginButtonsProps {
-  actionText: string;
+  action: 'signin' | 'signup';
 }
 
-export function SocialLoginButtons({ actionText }: SocialLoginButtonsProps) {
+export function SocialLoginButtons({ action }: SocialLoginButtonsProps) {
+  const t = useTranslations(`Auth.${action}`);
+  const tMisc = useTranslations('Misc');
+
   return (
     <>
       <div className="w-full after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
         <span className="bg-background text-muted-foreground relative z-10 px-2">
-          Or
+          {tMisc('or')}
         </span>
       </div>
       <div className="grid gap-4 justify-center sm:grid-cols-2">
@@ -26,7 +30,7 @@ export function SocialLoginButtons({ actionText }: SocialLoginButtonsProps) {
             width={20}
             height={20}
           />
-          {actionText} with Facebook
+          {t('with_facebook')}
         </Button>
         <Button
           variant="outline"
@@ -39,7 +43,7 @@ export function SocialLoginButtons({ actionText }: SocialLoginButtonsProps) {
             width={16}
             height={16}
           />
-          {actionText} with Google
+          {t('with_google')}
         </Button>
       </div>
     </>

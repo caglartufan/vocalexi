@@ -143,7 +143,7 @@ export default function SignInForm({
                 {t('Auth.signin.signup_link')}
               </AuthLink>
             </div>
-            <SocialLoginButtons actionText={t('Auth.signin.button')} />
+            <SocialLoginButtons action={'signin'} />
           </div>
         </div>
       </form>

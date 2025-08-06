@@ -27,24 +27,38 @@
       "button": "Sign In",
       "forgot": "Forgot Password?",
       "new_user": "New user?",
-      "signup_link": "Sign Up"
+      "signup_link": "Sign Up",
+      "with_google": "Sign in with Google",
+      "with_facebook": "Sign in with Facebook"
     },
     "signup": {
       "title": "Welcome New User!",
       "button": "Sign Up",
       "already_have_account": "Already have an account?",
-      "signin_link": "Sign In"
+      "signin_link": "Sign In",
+      "with_google": "Sign up with Google",
+      "with_facebook": "Sign up with Facebook"
     },
     "error": {
       "invalid_credentials": "Invalid email or password. Please check your credentials and try again.",
       "generic_signin": "Something went wrong during sign in. Please try again.",
       "generic_signup": "Something went wrong during sign up. Please try again.",
       "unknown_signin": "An error occurred during sign in. Please try again.",
-      "unknown_signup": "An error occurred during sign up. Please try again."
+      "unknown_signup": "An error occurred during sign up. Please try again.",
+      "email_exists": "A user with the provided email address already exists.",
+      "validation_failed": "Could not validate provided user information."
     },
     "success": {
       "signed_in": "You have successfully signed in!",
       "signed_up": "You have successfully signed up!"
+    },
+    "footer": {
+      "agree": "By clicking continue, you agree to our <link>terms</link> and <link>privacy</link>.",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
     }
+  },
+  "Misc": {
+    "or": "Or"
   }
 }

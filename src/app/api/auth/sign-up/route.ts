@@ -1,19 +1,24 @@
 import { connectDB } from '@/lib/connectDB';
 import { NextRequest, NextResponse } from 'next/server';
 import {
+  getSignUpRequestSchema,
   SignUpRequestBody,
-  signUpRequestSchema,
 } from '@/validation-schemas/sign-up';
 import ErrorHandler from '@/lib/error-handler';
 import { User } from '@/models/User';
 import bcrypt from 'bcrypt';
+import { getTranslations } from 'next-intl/server';
 
 export async function POST(request: NextRequest) {
+  const t = await getTranslations();
+  const tAuthError = await getTranslations('Auth.error');
+
   try {
     await connectDB();
 
     const res: SignUpRequestBody = await request.json();
-    await signUpRequestSchema.validate(res, {
+    const schema = getSignUpRequestSchema(t);
+    await schema.validate(res, {
       abortEarly: false,
     });
 
@@ -23,7 +28,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: 'A user with provided email address already exists.',
+          message: tAuthError('email_exists'),
         },
         { status: 400 },
       );
@@ -48,7 +53,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (error: unknown) {
     return ErrorHandler.respond(error, {
-      validationMessage: 'Could not validate provided user information.',
+      validationMessage: tAuthError('validation_failed'),
     });
   }
 }

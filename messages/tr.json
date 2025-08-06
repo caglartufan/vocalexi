@@ -1,0 +1,64 @@
+{
+  "Auth": {
+    "fields": {
+      "email": "E-posta adresi",
+      "password": "Şifre",
+      "first_name": "Ad",
+      "last_name": "Soyad",
+      "password_confirmation": "Şifreyi onayla"
+    },
+    "validation": {
+      "email_required": "Lütfen bir e-posta adresi girin.",
+      "password_required": "Lütfen bir şifre girin.",
+      "first_name_required": "Lütfen adınızı girin.",
+      "last_name_required": "Lütfen soyadınızı girin.",
+      "password_confirmation_required": "Lütfen şifrenizi onaylayın.",
+      "email": "Lütfen geçerli bir e-posta adresi girin.",
+      "email_max": "E-posta en fazla 255 karakter olabilir.",
+      "password_min": "Şifre en az 6 karakter olmalıdır.",
+      "first_name_min": "Ad en az 2 karakter olmalıdır.",
+      "first_name_max": "Ad en fazla 50 karakter olabilir.",
+      "last_name_min": "Soyad en az 2 karakter olmalıdır.",
+      "last_name_max": "Soyad en fazla 50 karakter olabilir.",
+      "password_match": "Şifreler eşleşmelidir."
+    },
+    "signin": {
+      "title": "Tekrar Hoş Geldiniz!",
+      "button": "Giriş Yap",
+      "forgot": "Şifrenizi mi unuttunuz?",
+      "new_user": "Yeni misiniz?",
+      "signup_link": "Kayıt Ol",
+      "with_google": "Google ile giriş yap",
+      "with_facebook": "Facebook ile giriş yap"
+    },
+    "signup": {
+      "title": "Hoş Geldiniz!",
+      "button": "Kayıt Ol",
+      "already_have_account": "Zaten bir hesabınız var mı?",
+      "signin_link": "Giriş Yap",
+      "with_google": "Google ile kayıt ol",
+      "with_facebook": "Facebook ile kayıt ol"
+    },
+    "error": {
+      "invalid_credentials": "Geçersiz e-posta veya şifre. Lütfen bilgilerinizi kontrol edin ve tekrar deneyin.",
+      "generic_signin": "Giriş yapılırken bir sorun oluştu. Lütfen tekrar deneyin.",
+      "generic_signup": "Kayıt olurken bir sorun oluştu. Lütfen tekrar deneyin.",
+      "unknown_signin": "Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.",
+      "unknown_signup": "Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.",
+      "email_exists": "Bu e-posta adresiyle zaten bir kullanıcı mevcut.",
+      "validation_failed": "Sağlanan kullanıcı bilgileri doğrulanamadı."
+    },
+    "success": {
+      "signed_in": "Başarıyla giriş yaptınız!",
+      "signed_up": "Başarıyla kayıt oldunuz!"
+    },
+    "footer": {
+      "agree": "Devam'a tıklayarak <link>terms</link> ve <link>privacy</link> kabul etmiş olursunuz.",
+      "terms": "Hizmet Şartlarını",
+      "privacy": "Gizlilik Politikasını"
+    }
+  },
+  "Misc": {
+    "or": "veya"
+  }
+}
