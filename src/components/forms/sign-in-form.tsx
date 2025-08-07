@@ -129,7 +129,11 @@ export default function SignInForm({
                 <FormErrorMessage message={formik.errors.password!} />
               )}
             </div>
-            <Button type="submit" className="w-full rounded-full h-10">
+            <Button
+              type="submit"
+              className="w-full rounded-full h-10"
+              disabled={formik.isSubmitting}
+            >
               {t('Auth.signin.button')}
             </Button>
             <div className="text-center">

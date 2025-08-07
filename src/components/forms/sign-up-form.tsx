@@ -226,7 +226,11 @@ export default function SignUpForm({
                 />
               )}
             </div>
-            <Button type="submit" className="w-full rounded-full h-10">
+            <Button
+              type="submit"
+              className="w-full rounded-full h-10"
+              disabled={formik.isSubmitting}
+            >
               {t('Auth.signup.button')}
             </Button>
             <div className="text-center text-xs">
