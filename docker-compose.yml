@@ -1,0 +1,50 @@
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/certificates:/etc/nginx/certificates
+      - /etc/letsencrypt/options-ssl-nginx.conf:/etc/letsencrypt/options-ssl-nginx.conf
+      - /etc/letsencrypt/ssl-dhparams.pem:/etc/letsencrypt/ssl-dhparams.pem
+    depends_on:
+      - web
+    networks:
+      - app
+  web:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: web
+    restart: unless-stopped
+    expose:
+      - '3000'
+    environment:
+      NODE_ENV: "production"
+    depends_on:
+      - mongodb
+    networks:
+      - app
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: '${MONGODB_USERNAME}'
+      MONGO_INITDB_ROOT_PASSWORD: '${MONGODB_PASSWORD}'
+      MONGO_INITDB_DATABASE: '${MONGODB_DATABASE}'
+    # ports:
+    #  - "27017:27017" # optional: remove if only web needs access
+    volumes:
+      - mongodb:/data/db
+    networks:
+      - app
+networks:
+  app:
+    driver: bridge
+volumes:
+  mongodb:
+    driver: local
