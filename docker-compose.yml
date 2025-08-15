@@ -36,9 +36,12 @@ services:
       MONGO_INITDB_ROOT_USERNAME: '${MONGODB_USERNAME}'
       MONGO_INITDB_ROOT_PASSWORD: '${MONGODB_PASSWORD}'
       MONGO_INITDB_DATABASE: '${MONGODB_DATABASE}'
-    # ports:
-    #  - "27017:27017" # optional: remove if only web needs access
+    ports:
+      - "27017:27017"
     volumes:
+      # Init script
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      # MongoDB data
       - mongodb:/data/db
     networks:
       - app
