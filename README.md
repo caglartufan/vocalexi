@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Vocalexi is a multi-language word learning app.
 
 ## Getting Started
 
@@ -20,17 +20,49 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Creating SSL Certificates
 
-To learn more about Next.js, take a look at the following resources:
+Step 1: Update package lists
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+sudo apt update
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Step 2: Install required packages
 
-## Deploy on Vercel
+You’ll need:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- curl to download the config file
+- openssl to generate DH parameters
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Install them with:
+
+```bash
+sudo apt install -y curl openssl
+```
+
+Step 3: Create the /etc/letsencrypt directory (if it doesn’t exist)
+
+```bash
+sudo mkdir -p /etc/letsencrypt
+```
+
+Step 4: Download the recommended SSL options config file
+
+```bash
+sudo curl -o /etc/letsencrypt/options-ssl-nginx.conf https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
+```
+
+Step 5: Generate the Diffie-Hellman parameters file
+
+```bash
+sudo openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 2048
+```
+
+Step 6: Ensure SSL certificates are provided
+
+Ensure there are SSL certificate files required by the application are
+provided in the /nginx/certificates/ directory. These files are:
+
+- `domain.cert.pem`
+- `private.key.pem`
