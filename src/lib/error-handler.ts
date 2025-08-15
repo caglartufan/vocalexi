@@ -43,6 +43,7 @@ export default class ErrorHandler {
   constructor() {}
 
   public static handle(error: unknown, options: HandlerOptions) {
+    console.log(error);
     if (error instanceof ValidationError) {
       return new BadRequestError(
         options.validationMessage || error.message,
