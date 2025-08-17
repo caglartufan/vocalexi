@@ -1,4 +1,3 @@
-import HeaderToolbar from '@/components/layout/HeaderToolbar';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import React from 'react';
 import { getServerSession } from 'next-auth';
@@ -17,8 +16,7 @@ export default async function MainLayout({
   return (
     <>
       <MobileHeader />
-      <main className="flex flex-col gap-y-4 font-sans h-full p-4 pb-16">
-        <HeaderToolbar />
+      <main className="flex flex-col gap-y-4 font-sans h-full pt-4 px-10 pb-16">
         {children}
       </main>
       <MobileBottomNav />
