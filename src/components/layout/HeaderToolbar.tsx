@@ -1,6 +1,6 @@
 import { ArrowRightLeft, Search } from 'lucide-react';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/buttons/button';
 
 export default function HeaderToolbar() {
   return (

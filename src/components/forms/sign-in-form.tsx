@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/buttons/button';
 import { Input } from '@/components/ui/input';
 import React from 'react';
 import AuthLink from '@/components/typography/auth-link';

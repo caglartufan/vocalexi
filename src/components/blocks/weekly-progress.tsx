@@ -8,7 +8,7 @@ function DailyProgressCircle({
     <div className="flex flex-col items-center gap-y-0.5">
       <div
         className={cn(
-          'flex items-center justify-center size-8 font-semibold text-primary rounded-full border border-primary',
+          'flex items-center justify-center size-8 font-semibold text-primary text-lg rounded-full border border-primary',
           {
             'bg-primary text-white': isAchieved,
           },
@@ -16,7 +16,7 @@ function DailyProgressCircle({
       >
         {number}
       </div>
-      <span className="text-primary text-2xs font-bold">day</span>
+      <span className="text-primary text-xs font-bold">day</span>
     </div>
   );
 }
@@ -24,11 +24,11 @@ function DailyProgressCircle({
 export default function WeeklyProgress() {
   return (
     <section>
-      <p className="text-xs font-semibold text-center mb-7">
+      <p className="text-sm font-semibold text-center mb-7">
         You are on a roll! Keep learning new words to gain knowledge!
       </p>
       <div>
-        <p className="text-xs font-semibold text-muted-foreground text-center mb-1.5">
+        <p className="text-sm font-semibold text-muted-foreground text-center mb-1.5">
           Week 1
         </p>
         <div className="flex items-center justify-center gap-x-4">
