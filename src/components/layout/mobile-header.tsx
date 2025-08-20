@@ -7,23 +7,13 @@ import {
   LanguagesIcon,
   MenuIcon,
 } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import BackButton from '@/components/ui/buttons/back-button';
+import { useNav } from '@/context/nav-context';
 
 export default function MobileHeader() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const pathNavOptionsMap = new Map([
-    [
-      '/quick-quiz',
-      {
-        title: 'Quick Quiz',
-        className: 'bg-amber-300',
-      },
-    ],
-  ]);
-  const { title, className } = pathNavOptionsMap.get(pathname) || {};
-  const shouldShowTitle = typeof title === 'string';
+  const { routeConfig } = useNav();
+  const shouldShowTitle = Boolean(routeConfig?.title);
 
   return (
     <div>
@@ -62,17 +52,19 @@ export default function MobileHeader() {
       </div>
       {/* TODO: Add a slide down animation to below part when title is shown */}
       {shouldShowTitle && (
-        <div className={cn('bg-secondary pt-8 -mt-8 shadow-md', className)}>
+        <div
+          className={cn(
+            'bg-secondary pt-8 -mt-8 shadow-md',
+            routeConfig?.className,
+          )}
+        >
           <div className="flex items-center gap-x-1 px-6 py-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-8"
-              onClick={router.back}
-            >
+            <BackButton variant="ghost" size="icon" className="size-8">
               <CircleArrowLeftIcon className="size-6 text-black" />
-            </Button>
-            <h1 className="text-black text-xl font-bold">{title}</h1>
+            </BackButton>
+            <h1 className="text-black text-xl font-bold">
+              {routeConfig?.title}
+            </h1>
           </div>
         </div>
       )}
