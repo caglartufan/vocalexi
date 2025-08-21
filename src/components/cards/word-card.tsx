@@ -1,24 +1,28 @@
 'use client';
 import { Button } from '@/components/ui/buttons/button';
-import Link from 'next/link';
-import { BookmarkIcon, ClipboardCheckIcon } from 'lucide-react';
+import { BookmarkIcon } from 'lucide-react';
 
 import { MouseEvent, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
-export default function WordListCard({
-  id,
-  title,
-  wordCount,
-  lastQuizAt,
-}: Readonly<{
+export interface Word {
   id: string;
-  title: string;
-  wordCount: number;
-  lastQuizAt: string;
+  text: string;
+  pronunciation: string;
+  definitions: string[];
+  examples: string[];
+  isFavorite: boolean;
+}
+
+export default function WordCard({
+  word,
+}: Readonly<{
+  word: Word;
 }>) {
   const router = useRouter();
   const cardRef = useRef<HTMLDivElement>(null);
+  const { id, text, pronunciation, definitions, isFavorite } = word;
 
   // Prevent card click if the child interactive elements are clicked
   const handleCardClick = (event: MouseEvent<HTMLDivElement>) => {
@@ -27,7 +31,7 @@ export default function WordListCard({
       event.target instanceof HTMLElement &&
       event.currentTarget === cardRef.current
     ) {
-      router.push(`/word-lists/${id}`);
+      router.push(`/word/${id}`);
     }
   };
 
@@ -49,22 +53,11 @@ export default function WordListCard({
         focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary
         active:scale-[0.98]
       `}
-      aria-label={`Word list: ${title}`}
+      aria-label={`Word: ${text}`}
     >
       <div className="flex items-center justify-between">
-        <span className="text-xl font-semibold">{title}</span>
+        <span className="text-xl font-semibold">{text}</span>
         <div className="flex items-center gap-x-1">
-          <Button
-            className="size-6"
-            size="icon"
-            variant="ghost"
-            onClick={stopPropagationHandler}
-            asChild
-          >
-            <Link href="/quiz" tabIndex={0}>
-              <ClipboardCheckIcon className="size-5 stroke-primary" />
-            </Link>
-          </Button>
           <Button
             className="size-6"
             size="icon"
@@ -73,14 +66,18 @@ export default function WordListCard({
             // stopPropagation prevents the parent card from firing its onClick
             onClick={stopPropagationHandler}
           >
-            <BookmarkIcon className="size-5 fill-primary stroke-primary" />
+            <BookmarkIcon
+              className={cn('size-5 stroke-primary', {
+                'fill-primary': isFavorite,
+              })}
+            />
           </Button>
         </div>
       </div>
-      <span className="text-primary font-medium">
-        Includes {wordCount} words
-      </span>
-      <span className="text-sm font-medium">{lastQuizAt}</span>
+      <span className="font-light">{pronunciation}</span>
+      <ol className="list-decimal list-inside flex flex-col gap-y-2 text-sm font-medium">
+        <li>{definitions[0]}</li>
+      </ol>
     </div>
   );
 }

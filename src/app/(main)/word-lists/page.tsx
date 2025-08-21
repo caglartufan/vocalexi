@@ -1,8 +1,24 @@
+'use client';
 import WordListCard from '@/components/cards/word-list-card';
 import { Button } from '@/components/ui/buttons/button';
 import { PlusIcon } from 'lucide-react';
+import { useNav } from '@/context/nav-context';
+import { useEffect } from 'react';
 
 export default function Page() {
+  const { setRouteConfig } = useNav();
+
+  useEffect(() => {
+    setRouteConfig({
+      title: 'Word Lists',
+      className: 'bg-green-300',
+    });
+
+    return () => {
+      setRouteConfig(null);
+    };
+  }, [setRouteConfig]);
+
   return (
     <div className="flex flex-col gap-y-5 p-1">
       <WordListCard

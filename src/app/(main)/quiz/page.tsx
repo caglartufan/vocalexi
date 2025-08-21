@@ -1,9 +1,25 @@
+'use client';
 import SwitchLanguageButton from '@/components/ui/buttons/switch-language-button';
 import { Button } from '@/components/ui/buttons/button';
 import { ChevronsLeftIcon, ChevronsRightIcon } from 'lucide-react';
 import QuizAnswerButton from '@/components/ui/buttons/quiz-answer-button';
+import { useNav } from '@/context/nav-context';
+import { useEffect } from 'react';
 
 export default function Page() {
+  const { setRouteConfig } = useNav();
+
+  useEffect(() => {
+    setRouteConfig({
+      title: 'Quiz',
+      className: 'bg-amber-300',
+    });
+
+    return () => {
+      setRouteConfig(null);
+    };
+  }, [setRouteConfig]);
+
   return (
     <div className="flex flex-col items-center justify-center w-full">
       <SwitchLanguageButton />

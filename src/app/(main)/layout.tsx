@@ -18,7 +18,7 @@ export default async function MainLayout({
     <NavProvider>
       <>
         <MobileHeader />
-        <main className="flex flex-col gap-y-4 font-sans h-full pt-4 px-10 pb-16">
+        <main className="flex flex-col gap-y-4 font-sans h-full pt-4 px-10 pb-24">
           {children}
         </main>
         <MobileBottomNav />

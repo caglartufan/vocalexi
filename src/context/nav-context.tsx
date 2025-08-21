@@ -1,7 +1,10 @@
 'use client';
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { getRouteConfig, RouteConfig } from '@/lib/get-route-config';
+import React, { createContext, useContext, useState } from 'react';
+
+interface RouteConfig {
+  title: string;
+  className: string;
+}
 
 interface NavContextType {
   routeConfig: RouteConfig | null;
@@ -17,19 +20,7 @@ const NavContext = createContext<NavContextType>({
 export function NavProvider({
   children,
 }: Readonly<{ children: React.ReactElement }>) {
-  const pathname = usePathname();
   const [routeConfig, setRouteConfig] = useState<RouteConfig | null>(null);
-
-  useEffect(() => {
-    // Update nav config whenever pathname changes
-    async function updateNav() {
-      const config = await getRouteConfig(pathname);
-      setRouteConfig(config);
-    }
-
-    // noinspection JSIgnoredPromiseFromCall
-    updateNav();
-  }, [pathname]);
 
   return (
     <NavContext.Provider value={{ routeConfig, setRouteConfig }}>
