@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
 // 1. Interface for User properties
 export interface IUser {
@@ -21,8 +21,10 @@ export interface PublicUser {
   updatedAt?: Date;
 }
 
-// 2. Extend Document if you want `._id` and mongoose instance methods
-export interface IUserDocument extends IUser, Document {}
+// 2. Extend Document with explicit _id typing
+export interface IUserDocument extends IUser, Document {
+  _id: Types.ObjectId;
+}
 
 // 3. Schema definition
 const UserSchema = new Schema<IUserDocument>(

@@ -29,6 +29,12 @@ export class BadRequestError extends HTTPError {
   }
 }
 
+export class UnauthorizedError extends HTTPError {
+  constructor(message: string = 'Unauthorized.') {
+    super(message, 401);
+  }
+}
+
 export class InternalError extends HTTPError {
   constructor(message: string = 'An internal error occurred.') {
     super(message, 500);
@@ -49,6 +55,8 @@ export default class ErrorHandler {
         options.validationMessage || error.message,
         error.errors,
       );
+    } else if (error instanceof HTTPError) {
+      return error;
     } else if (error instanceof Error) {
       return new InternalError(error.message);
     } else {
