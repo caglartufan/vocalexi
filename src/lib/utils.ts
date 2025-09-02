@@ -15,3 +15,11 @@ export function shouldShowFormikError<T>(
     (formik.touched[fieldName] as boolean)
   );
 }
+
+export function constructFallbackErrorMessage(message: string, error: unknown) {
+  if (error instanceof Error && typeof error?.message === 'string')
+    message = `${message}: ${error.message}`;
+  else message = `${message}.`;
+
+  return message;
+}

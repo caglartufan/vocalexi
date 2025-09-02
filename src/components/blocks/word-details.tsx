@@ -1,10 +1,15 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/buttons/button';
 import { BookmarkIcon, PlusIcon, Volume2Icon } from 'lucide-react';
+import { Word } from '@/types/types';
+import reactStringReplace from 'react-string-replace';
 
 export default function WordDetails({
   className,
-}: Readonly<{ className?: string }>) {
+  word,
+}: Readonly<{ className?: string; word?: Word }>) {
+  if (!word) return null;
+
   return (
     <div className={cn('flex justify-between gap-x-3', className)}>
       <div>
@@ -13,26 +18,30 @@ export default function WordDetails({
         </Button>
       </div>
       <div className="flex flex-col">
-        <h3 className="text-xl leading-snug font-semibold">cumbersome</h3>
-        <h4 className="text-sm mb-1 font-light">/ˈkəmbərsəm/</h4>
+        <h3 className="text-xl leading-snug font-semibold">{word.word}</h3>
+        {(word.ipa !== null || word.romanization !== null) && (
+          <h4 className="text-sm mb-1 font-light">
+            {word.ipa || word.romanization}
+          </h4>
+        )}
         <ol className="list-decimal list-inside flex flex-col gap-y-2">
-          <li>
-            large or heavy and therefore difficult to carry or use; unwieldy.
-          </li>
-          <li>slow or complicated and therefore inefficient</li>
+          {word.meanings.map((meaning, index) => (
+            <li key={index}>{meaning}</li>
+          ))}
         </ol>
         <hr className="my-3 mx-1" />
         <div>
           <h5 className="text-lg font-semibold mb-1">Used in sentences:</h5>
           <ol className="list-decimal list-inside flex flex-col gap-y-2">
-            <li>
-              &#34;The shoes were too big on my feet, and they felt very{' '}
-              <b>cumbersome.</b>&#34;
-            </li>
-            <li>
-              &#34;Carrying the heavy box down the stairs was very{' '}
-              <b>cumbersome</b>.&#34;
-            </li>
+            {word.examples[word.language].map((example, index) => (
+              <li key={index}>
+                &#34;
+                {reactStringReplace(example, word.word, (match, matchIndex) => (
+                  <b key={matchIndex}>{match}</b>
+                ))}
+                &#34;
+              </li>
+            ))}
           </ol>
         </div>
       </div>
