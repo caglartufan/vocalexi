@@ -37,7 +37,15 @@ export default function WordSearch() {
             searchedAt: new Date().toISOString(),
           };
 
-          return [currentSearch, prevRecentSearches[0], prevRecentSearches[1]];
+          const newRecentSearches = [currentSearch];
+          if (typeof prevRecentSearches[0] !== 'undefined') {
+            newRecentSearches.push(prevRecentSearches[0]);
+          }
+          if (typeof prevRecentSearches[1] !== 'undefined') {
+            newRecentSearches.push(prevRecentSearches[1]);
+          }
+
+          return newRecentSearches;
         },
         {
           revalidate: false,
