@@ -17,6 +17,7 @@ export interface IQuiz {
 // Word interface
 export interface IWord extends Document {
   word: string;
+  audioURL: string | null;
   language: string;
   ipa: string | null;
   romanization: string | null;
@@ -59,9 +60,9 @@ const QuizSchema = new Schema<IQuiz>(
       required: true,
       validate: {
         validator: function (options: IQuizOption[]) {
-          return options.length === 4;
+          return options.length >= 2;
         },
-        message: 'Quiz must have exactly 4 options',
+        message: 'Quiz must have at least 2 options',
       },
     },
   },
@@ -74,6 +75,10 @@ const WordSchema = new Schema<IWord>(
     word: {
       type: String,
       required: true,
+    },
+    audioURL: {
+      type: String,
+      default: null,
     },
     language: {
       type: String,

@@ -58,8 +58,8 @@ export default function WordSearch() {
           {
             params: {
               word: values.word,
-              language: 'en-US',
-              translation_language: 'tr-TR',
+              language: 'tr-TR',
+              translation_language: 'de-DE',
             },
           },
         );

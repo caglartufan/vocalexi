@@ -9,6 +9,7 @@ export interface Quiz {
 
 export interface Word {
   id: string;
+  audioURL: string | null;
   word: string;
   language: string;
   ipa: string | null;

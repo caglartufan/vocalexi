@@ -7,6 +7,9 @@ import type {
   ResponseUsage,
 } from 'openai/resources/responses/responses';
 import { BadRequestError, InternalError } from '@/lib/error-handler';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import { buildPublicUrl } from '@/lib/utils-srv';
 
 export type GenerateWordRequestBody = {
   word: string;
@@ -140,6 +143,34 @@ export class WordService {
     });
   }
 
+  static async generateWordSpeech(
+    wordId: string,
+    word: string,
+    language: string,
+  ) {
+    const response = await openai.audio.speech.create({
+      model: 'gpt-4o-mini-tts',
+      voice: 'shimmer',
+      instructions: `Pronounce the given word in ${language}.`,
+      input: word,
+      response_format: 'mp3',
+    });
+
+    // response is a readable stream (Node)
+    const buffer = Buffer.from(await response.arrayBuffer());
+    // Build the folder and file path
+    const dirPath = path.join('./public/audio/');
+    const filePath = path.join(dirPath, `${wordId}.mp3`);
+
+    // Ensure nested folders exist
+    await fs.mkdir(dirPath, { recursive: true });
+
+    // Write the file
+    await fs.writeFile(filePath, buffer);
+
+    return filePath;
+  }
+
   static async getOrGenerateWord(
     params: GenerateWordRequestBody,
   ): Promise<WordGenerationResult> {
@@ -161,7 +192,13 @@ export class WordService {
     const openAIResponse = await this.generateWordData(params);
     const generatedWord = this.processOpenAIResponse(openAIResponse);
     const wordModel = this.transformToWordModel(generatedWord, params);
+    const audioFilePath = await this.generateWordSpeech(
+      wordModel._id!.toString(),
+      wordModel.word,
+      wordModel.language,
+    );
 
+    wordModel.audioURL = buildPublicUrl(audioFilePath);
     await wordModel.save();
 
     return {

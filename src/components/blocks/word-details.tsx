@@ -3,17 +3,35 @@ import { Button } from '@/components/ui/buttons/button';
 import { BookmarkIcon, PlusIcon, Volume2Icon } from 'lucide-react';
 import { Word } from '@/types/types';
 import reactStringReplace from 'react-string-replace';
+import { useRef } from 'react';
 
 export default function WordDetails({
   className,
   word,
 }: Readonly<{ className?: string; word?: Word }>) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const playAudioHandler = async () => {
+    if (typeof word === 'undefined' || word.audioURL === null) return;
+
+    if (!audioRef.current) {
+      audioRef.current = new Audio(word.audioURL);
+    }
+
+    await audioRef.current.play();
+  };
+
   if (!word) return null;
 
   return (
     <div className={cn('flex justify-between gap-x-3', className)}>
       <div>
-        <Button className="size-7 rounded-full" size="icon">
+        <Button
+          className="size-7 rounded-full"
+          size="icon"
+          onClick={playAudioHandler}
+          disabled={!word.audioURL}
+        >
           <Volume2Icon />
         </Button>
       </div>
