@@ -20,37 +20,40 @@ export default function WordSearch() {
   const formik = useFormik({
     initialValues: {
       word: '',
+      shouldLog: true,
     },
-    onSubmit: async (values) => {
+    onSubmit: async (values, formikHelpers) => {
       let originalRecentSearches;
 
-      await mutateRecentSearches(
-        (prevRecentSearches) => {
-          if (typeof prevRecentSearches === 'undefined')
-            return prevRecentSearches;
+      if (values.shouldLog) {
+        await mutateRecentSearches(
+          (prevRecentSearches) => {
+            if (typeof prevRecentSearches === 'undefined')
+              return prevRecentSearches;
 
-          originalRecentSearches = [...prevRecentSearches];
-          const currentSearch: RecentSearch = {
-            word: values.word,
-            language: 'en-US',
-            translation_language: 'tr-TR',
-            searchedAt: new Date().toISOString(),
-          };
+            originalRecentSearches = [...prevRecentSearches];
+            const currentSearch: RecentSearch = {
+              word: values.word,
+              language: 'en-US',
+              translation_language: 'tr-TR',
+              searchedAt: new Date().toISOString(),
+            };
 
-          const newRecentSearches = [currentSearch];
-          if (typeof prevRecentSearches[0] !== 'undefined') {
-            newRecentSearches.push(prevRecentSearches[0]);
-          }
-          if (typeof prevRecentSearches[1] !== 'undefined') {
-            newRecentSearches.push(prevRecentSearches[1]);
-          }
+            const newRecentSearches = [currentSearch];
+            if (typeof prevRecentSearches[0] !== 'undefined') {
+              newRecentSearches.push(prevRecentSearches[0]);
+            }
+            if (typeof prevRecentSearches[1] !== 'undefined') {
+              newRecentSearches.push(prevRecentSearches[1]);
+            }
 
-          return newRecentSearches;
-        },
-        {
-          revalidate: false,
-        },
-      );
+            return newRecentSearches;
+          },
+          {
+            revalidate: false,
+          },
+        );
+      }
 
       try {
         const res = await axios.get<{ success: boolean; word: Word }>(
@@ -60,6 +63,7 @@ export default function WordSearch() {
               word: values.word,
               language: 'tr-TR',
               translation_language: 'de-DE',
+              should_log: values.shouldLog ? 'true' : 'false',
             },
           },
         );
@@ -90,10 +94,15 @@ export default function WordSearch() {
           showToast();
         }
 
-        // Rollback
-        await mutateRecentSearches(originalRecentSearches, {
-          revalidate: false,
-        });
+        if (values.shouldLog) {
+          // Rollback
+          await mutateRecentSearches(originalRecentSearches, {
+            revalidate: false,
+          });
+        }
+      } finally {
+        // Reset shouldLog to true after the search is finished
+        await formikHelpers.setFieldValue('shouldLog', true, false);
       }
     },
   });
@@ -101,7 +110,10 @@ export default function WordSearch() {
   const handleRecentSearchClick = async (search: RecentSearch) => {
     if (search.word === word?.word) return;
 
-    await formik.setFieldValue('word', search.word);
+    await Promise.all([
+      formik.setFieldValue('word', search.word),
+      formik.setFieldValue('shouldLog', false),
+    ]);
     await formik.submitForm();
   };
 
@@ -142,21 +154,27 @@ export default function WordSearch() {
               Previously searched words
             </span>
             <div className="flex gap-2 mb-8">
-              {recentSearches.map((search, index) => (
-                <Badge
-                  key={`${search.word}-${search.searchedAt}`}
-                  variant={index === 0 ? 'default' : 'muted'}
-                  asChild
-                >
-                  <Button
-                    variant="ghost"
-                    className="text-sm size-auto"
-                    onClick={handleRecentSearchClick.bind(null, search)}
+              {recentSearches.map((search) => {
+                const isActive = formik.isSubmitting
+                  ? formik.values.word === search.word
+                  : word?.word === search.word;
+
+                return (
+                  <Badge
+                    key={`${search.word}-${search.searchedAt}`}
+                    variant={isActive ? 'default' : 'muted'}
+                    asChild
                   >
-                    {search.word}
-                  </Button>
-                </Badge>
-              ))}
+                    <Button
+                      variant="ghost"
+                      className="text-sm size-auto"
+                      onClick={handleRecentSearchClick.bind(null, search)}
+                    >
+                      {search.word}
+                    </Button>
+                  </Badge>
+                );
+              })}
             </div>
           </>
         )}

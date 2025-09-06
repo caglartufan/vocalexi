@@ -36,6 +36,7 @@ export class ActionLogService {
     language: string,
     translationLanguage: string,
     isValid: boolean,
+    isHidden: boolean,
   ): Promise<void> {
     await this.logAction({
       userId,
@@ -45,6 +46,7 @@ export class ActionLogService {
         language,
         translation_language: translationLanguage,
         isValid,
+        isHidden,
       },
     });
   }
@@ -125,6 +127,7 @@ export class ActionLogService {
       user: userId,
       actionType: ActionType.WORD_SEARCHED,
       'payload.isValid': isValid,
+      'payload.isHidden': false,
     })
       .sort({ createdAt: -1 })
       .limit(limit)

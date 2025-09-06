@@ -167,6 +167,9 @@ export class WordService {
   static async getOrGenerateWord(
     params: GenerateWordRequestBody,
   ): Promise<WordGenerationResult> {
+    // Normalize word
+    params.word = params.word.trim().toLocaleLowerCase(params.language);
+
     // Check for existing word
     const existingWord = await this.findExistingWord(
       params.word,

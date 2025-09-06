@@ -6,14 +6,14 @@ import { wordSearchRequestValidator } from '@/request/validators/word-search-req
 import { ActionLogService, WordService } from '@/services';
 
 export async function GET(req: NextRequest) {
-  let user, params;
+  let user;
 
   try {
     // Authentication
     user = await authenticateUser(req);
 
     // Validation
-    params = await wordSearchRequestValidator(req);
+    const params = await wordSearchRequestValidator(req);
 
     // Get or generate word
     const generationStart = Date.now();
@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
         params.language,
         params.translation_language,
         true,
+        params.should_log === 'false',
       ),
     ];
 
@@ -63,6 +64,7 @@ export async function GET(req: NextRequest) {
         req.nextUrl.searchParams.get('word') || '',
         req.nextUrl.searchParams.get('language') || '',
         req.nextUrl.searchParams.get('translation_language') || '',
+        false,
         false,
       );
     }

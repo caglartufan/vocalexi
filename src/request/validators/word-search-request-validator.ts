@@ -5,6 +5,7 @@ export type GenerateWordRequestBody = {
   word: string;
   language: string;
   translation_language: string;
+  should_log?: string;
 };
 
 export async function wordSearchRequestValidator(req: NextRequest) {
@@ -13,8 +14,9 @@ export async function wordSearchRequestValidator(req: NextRequest) {
   const translation_language = req.nextUrl.searchParams.get(
     'translation_language',
   );
+  const should_log = req.nextUrl.searchParams.get('should_log');
 
-  const params = { word, language, translation_language };
+  const params = { word, language, translation_language, should_log };
   await getWordSearchRequestSchema().validate(params);
 
   return params as GenerateWordRequestBody;
