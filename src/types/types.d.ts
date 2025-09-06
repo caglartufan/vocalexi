@@ -1,4 +1,5 @@
 export interface Quiz {
+  wordId: string;
   question: string;
   options: {
     value: string;
@@ -16,7 +17,6 @@ export interface Word {
   romanization: string | null;
   meanings: string[];
   examples: { [key: string]: string[] };
-  quizzes: Quiz[];
   createdAt: Date;
   updatedAt: Date;
 }
