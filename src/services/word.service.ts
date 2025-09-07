@@ -7,9 +7,9 @@ import type {
   ResponseUsage,
 } from 'openai/resources/responses/responses';
 import { BadRequestError, InternalError } from '@/lib/error-handler';
-import path from 'node:path';
-import fs from 'node:fs/promises';
-import { buildPublicUrl } from '@/lib/utils-srv';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { s3Client } from '@/lib/s3Client';
+import { getSpaceFileUrl } from '@/lib/utils-srv';
 
 export type GenerateWordRequestBody = {
   word: string;
@@ -151,17 +151,19 @@ export class WordService {
 
     // response is a readable stream (Node)
     const buffer = Buffer.from(await response.arrayBuffer());
-    // Build the folder and file path
-    const dirPath = path.join('./public/audio/');
-    const filePath = path.join(dirPath, `${wordId}.mp3`);
+    const filePath = `audio/${language}/${wordId}.mp3`;
 
-    // Ensure nested folders exist
-    await fs.mkdir(dirPath, { recursive: true });
+    const command = new PutObjectCommand({
+      Bucket: process.env.DO_BUCKET,
+      Key: filePath,
+      Body: buffer,
+      ACL: 'public-read', // accessible to everyone
+      ContentType: 'audio/mpeg',
+    });
 
-    // Write the file
-    await fs.writeFile(filePath, buffer);
+    await s3Client.send(command);
 
-    return filePath;
+    return getSpaceFileUrl(filePath);
   }
 
   static async getOrGenerateWord(
@@ -200,13 +202,13 @@ export class WordService {
     const generatedWord =
       this.processOpenAIResponse<GeneratedWordDataSchema>(openAIResponse);
     const wordModel = this.transformToWordModel(params, generatedWord);
-    const audioFilePath = await this.generateWordSpeech(
+
+    wordModel.audioURL = await this.generateWordSpeech(
       wordModel._id!.toString(),
       wordModel.word,
       wordModel.language,
     );
 
-    wordModel.audioURL = buildPublicUrl(audioFilePath);
     await wordModel.save();
 
     return {
