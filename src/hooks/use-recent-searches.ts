@@ -12,9 +12,17 @@ export default function useRecentSearches() {
     '/api/user/recent-searches',
     async (url) => {
       const res = await fetch(url);
-      const data: { searches: RecentSearch[]; success: boolean } =
-        await res.json();
+      const data: {
+        searches: RecentSearch[];
+        success: boolean;
+      } = await res.json();
       return data.searches;
+    },
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 0,
     },
   );
 

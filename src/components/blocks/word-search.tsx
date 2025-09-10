@@ -11,7 +11,7 @@ import { Word } from '@/types/types';
 import { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import { constructFallbackErrorMessage } from '@/lib/utils';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export default function WordSearch() {
   const [word, setWord] = useState<Word | undefined>(undefined);
@@ -23,6 +23,8 @@ export default function WordSearch() {
       shouldLog: true,
     },
     onSubmit: async (values, formikHelpers) => {
+      if (word?.word === values.word) return;
+
       let originalRecentSearches;
 
       if (values.shouldLog) {
@@ -107,14 +109,25 @@ export default function WordSearch() {
     },
   });
 
-  const handleRecentSearchClick = async (search: RecentSearch) => {
-    if (search.word === word?.word) return;
+  const fetchWordData = useCallback(
+    async (word: string) => {
+      if (formik.isSubmitting) return;
 
-    await Promise.all([
-      formik.setFieldValue('word', search.word),
-      formik.setFieldValue('shouldLog', false),
-    ]);
-    await formik.submitForm();
+      await formik.setValues({
+        word,
+        shouldLog: false,
+      });
+
+      setTimeout(() => {
+        formik.submitForm();
+      }, 0);
+    },
+
+    [formik],
+  );
+
+  const handleRecentSearchClick = async (search: RecentSearch) => {
+    await fetchWordData(search.word);
   };
 
   return (
